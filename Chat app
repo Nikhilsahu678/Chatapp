@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-box { width: 300px; height: 400px; border: 1px solid #ccc; overflow-y: scroll; margin-bottom: 10px; padding: 10px; }
+        #message-input { width: 240px; }
+        #send-btn { width: 50px; }
+    </style>
+</head>
+<body>
+    <div id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Type your message...">
+    <button id="send-btn">Send</button>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js"></script>
+    <script>
+        // Firebase Configuration
+        var firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+
+        var database = firebase.database();
+        var chatBox = document.getElementById('chat-box');
+        var messageInput = document.getElementById('message-input');
+        var sendBtn = document.getElementById('send-btn');
+
+        // Listen for new messages
+        database.ref('messages').on('child_added', function(snapshot) {
+            var message = snapshot.val();
+            var messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+        });
+
+        // Send new message
+        sendBtn.addEventListener('click', function() {
+            var message = messageInput.value;
+            if (message.trim() !== "") {
+                database.ref('messages').push(message);
+                messageInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
